@@ -14,6 +14,8 @@ A Minecraft mod to allow players to "lock" an item frame by using Honeycomb on i
 3. Using an axe on a waxed Item Frame to "unlock" it
 
 ## Release Notes
+### 1.0.1
+- Removed extraneous quotation mark prevent Fabric from loading the mod
 ### 1.0.0
 - Initial Release
 
