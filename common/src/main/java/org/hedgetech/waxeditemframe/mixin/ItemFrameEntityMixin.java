@@ -2,13 +2,13 @@ package org.hedgetech.waxeditemframe.mixin;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ClipContext;
@@ -45,17 +45,16 @@ public class ItemFrameEntityMixin {
 
         // If the item frame has already been waxed, and we are interacting with an axe, remove wax / fixed state
         if (this.fixed) {
-            // If player is crouching, act natural!
-            if (player.isCrouching()) return;
+            if (!player.isCrouching()) {
+                if (heldItem.is(ItemTags.AXES)) {
+                    frame.playSound(SoundEvents.AXE_WAX_OFF.value(), 1.0F, 1.0F);
+                    frame.level().levelEvent(LevelEvent.PARTICLES_WAX_OFF, frame.getPos(), 0);
 
-            if (heldItem.getItem() instanceof AxeItem) {
-                frame.playSound(SoundEvents.AXE_WAX_OFF, 1.0F, 1.0F);
-                frame.level().levelEvent(LevelEvent.PARTICLES_WAX_OFF, frame.getPos(), 0);
+                    this.fixed = false;
 
-                this.fixed = false;
-
-                cir.setReturnValue(InteractionResult.SUCCESS);
-                return;
+                    cir.setReturnValue(InteractionResult.SUCCESS);
+                    return;
+                }
             }
 
             // If the frame is fixed, we want to attempt to interact with the first reachable target beyond the frame
@@ -67,7 +66,7 @@ public class ItemFrameEntityMixin {
         if (!this.fixed && heldItem.is(Items.HONEYCOMB)) {
             heldItem.shrink(1);
             frame.playSound(SoundEvents.HONEYCOMB_WAX_ON, 1.0F, 1.0F);
-            frame.level().levelEvent(LevelEvent.PARTICLES_AND_SOUND_WAX_ON, frame.getPos(), 0);
+            frame.level().levelEvent(LevelEvent.PARTICLES_WAX_ON, frame.getPos(), 0);
 
             this.fixed = true;
 
